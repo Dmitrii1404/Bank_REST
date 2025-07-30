@@ -2,13 +2,16 @@ package com.example.bankcards.service;
 
 
 import com.example.bankcards.dto.request.user.UserCreateRequest;
+import com.example.bankcards.dto.request.user.UserLoginRequest;
 import com.example.bankcards.dto.request.user.UserUpdateRequest;
+import com.example.bankcards.dto.response.user.UserLoginResponse;
 import com.example.bankcards.dto.response.user.UserResponse;
 import com.example.bankcards.entity.user.User;
 import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.exception.OperationException;
 import com.example.bankcards.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<UserResponse> findAll() {
         List<User> users = userRepository.findAll();
@@ -33,6 +37,14 @@ public class UserService {
         return response(user);
     }
 
+    public User findByEmail(String email) {
+        User user = userRepository.
+                findByEmail(email).
+                orElseThrow(() -> new NotFoundException("Пользователь не найден. Email: " + email));
+
+        return user;
+    }
+
     public UserResponse createUser(UserCreateRequest userCreateRequest) {
         if (userRepository.existsByEmail(userCreateRequest.email())) {
             throw new OperationException("Пользователь с email " + userCreateRequest.email() + " уже существует");
@@ -42,7 +54,7 @@ public class UserService {
                 .firstName(userCreateRequest.firstName())
                 .secondName(userCreateRequest.secondName())
                 .email(userCreateRequest.email())
-                .password(userCreateRequest.password())
+                .password(passwordEncoder.encode(userCreateRequest.password()))
                 .role(userCreateRequest.role())
                 .build();
 
@@ -50,6 +62,8 @@ public class UserService {
 
         return response(user);
     }
+
+
 
     public UserResponse updateUser(Long id, UserUpdateRequest userUpdateRequest) {
         User user = userRepository

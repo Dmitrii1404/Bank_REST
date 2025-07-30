@@ -18,3 +18,8 @@ spring:
 
 encrypt:
   key: ${ENCRYPT_KEY}
+
+security:
+  jwt:
+    secret: ${SECURITY_SECRET_KEY}
+    expiration-ms: 86400000
