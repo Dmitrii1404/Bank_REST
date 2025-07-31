@@ -1,9 +1,11 @@
 package com.example.bankcards.entity.user;
 
 import com.example.bankcards.entity.card.Card;
+import com.example.bankcards.entity.request.RequestBlock;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -38,4 +40,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<RequestBlock> requestBlocks = new ArrayList<>();
 }

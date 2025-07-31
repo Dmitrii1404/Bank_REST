@@ -2,9 +2,7 @@ package com.example.bankcards.service;
 
 
 import com.example.bankcards.dto.request.user.UserCreateRequest;
-import com.example.bankcards.dto.request.user.UserLoginRequest;
 import com.example.bankcards.dto.request.user.UserUpdateRequest;
-import com.example.bankcards.dto.response.user.UserLoginResponse;
 import com.example.bankcards.dto.response.user.UserResponse;
 import com.example.bankcards.entity.user.User;
 import com.example.bankcards.exception.NotFoundException;
@@ -38,11 +36,9 @@ public class UserService {
     }
 
     public User findByEmail(String email) {
-        User user = userRepository.
+        return userRepository.
                 findByEmail(email).
                 orElseThrow(() -> new NotFoundException("Пользователь не найден. Email: " + email));
-
-        return user;
     }
 
     public UserResponse createUser(UserCreateRequest userCreateRequest) {
@@ -80,7 +76,7 @@ public class UserService {
             user.setEmail(userUpdateRequest.email());
         }
         if (userUpdateRequest.password() != null) {
-            user.setPassword(userUpdateRequest.password());
+            user.setPassword(passwordEncoder.encode(userUpdateRequest.password()));
         }
 
         userRepository.save(user);

@@ -79,7 +79,7 @@ public class CardService {
                 .user(user)
                 .expirationDate(LocalDate.now().plusYears(1))
                 .status(CardStatus.ACTIVE)
-                .balance(BigDecimal.ZERO)
+                .balance(BigDecimal.valueOf(1000))
                 .build();
 
         Card newCard = cardRepository.save(card);
@@ -126,7 +126,7 @@ public class CardService {
             throw new OperationException("Перевод возможен только между активными картами");
         }
 
-        if (fromCard.getBalance().compareTo(toCard.getBalance()) < 0) {
+        if (fromCard.getBalance().compareTo(cardTransferRequest.amount()) < 0) {
             throw new OperationException("Недостаточно средств");
         }
 

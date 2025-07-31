@@ -1,4 +1,4 @@
-package com.example.bankcards.entity.requestBlock;
+package com.example.bankcards.entity.request;
 
 
 import com.example.bankcards.entity.card.Card;
@@ -24,14 +24,16 @@ public class RequestBlock {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "card_id")
     private Card card;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RequestBlockStatus status = RequestBlockStatus.NOT_STARTED;
+    private RequestStatus status = RequestStatus.NOT_STARTED;
 
     private LocalDateTime requestedAt = LocalDateTime.now();
 

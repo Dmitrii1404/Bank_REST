@@ -18,7 +18,7 @@ public class UserDetailsCustom implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     @Override
@@ -29,6 +29,10 @@ public class UserDetailsCustom implements UserDetails {
     @Override
     public String getUsername() {
         return user.getEmail();
+    }
+
+    public User getUser() {
+        return user;
     }
 
     @Override
