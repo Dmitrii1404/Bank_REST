@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: classpath:db/migration/changelog/db.changelog-001-create-users.yaml
+  - include:
+      file: classpath:db/migration/changelog/db.changelog-002-create-cards.yaml
+  - include:
+      file: classpath:db/migration/changelog/db.changelog-003-create-request-block.yaml

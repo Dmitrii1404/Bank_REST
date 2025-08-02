@@ -7,14 +7,18 @@ spring:
     username: postgres
     password: Dima_2145
     driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: classpath:db/migration/changelog/db.changelog-master.yaml
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     properties:
       format_sql: true
+
 
 encrypt:
   key: ${ENCRYPT_KEY}
