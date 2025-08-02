@@ -9,6 +9,8 @@ import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.exception.UserOperationException;
 import com.example.bankcards.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +23,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public List<UserResponse> findAll() {
-        List<User> users = userRepository.findAll();
-        return users.stream()
-                .map(this::response)
-                .toList();
+    public Page<UserResponse> findAll(Pageable pageable) {
+        Page<User> users = userRepository.findAll(pageable);
+        return users.map(this::response);
     }
 
     public UserResponse findById(Long id) {
@@ -61,9 +61,7 @@ public class UserService {
 
 
     public UserResponse updateUser(Long id, UserUpdateRequest userUpdateRequest) {
-        User user = userRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден. Id: " + id));
+        User user = findUserById(id);
 
         if (userUpdateRequest.firstName() != null) {
             user.setFirstName(userUpdateRequest.firstName());
