@@ -7,8 +7,9 @@ import com.example.bankcards.dto.response.card.CardResponse;
 import com.example.bankcards.entity.card.Card;
 import com.example.bankcards.entity.card.CardStatus;
 import com.example.bankcards.entity.user.User;
+import com.example.bankcards.exception.CardOperationException;
 import com.example.bankcards.exception.NotFoundException;
-import com.example.bankcards.exception.OperationException;
+import com.example.bankcards.exception.UserOperationException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.util.EncryptCard;
@@ -27,30 +28,29 @@ import java.time.LocalDate;
 public class CardService {
 
     private final CardRepository cardRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final EncryptCard encryptCard;
 
-    public Page<CardResponse> getAllCards(Pageable pageable) {
+    public Page<CardResponse> findAllCards(Pageable pageable) {
         Page<Card> cards = cardRepository.findAll(pageable);
 
         return cards.map(this::response);
     }
 
-    public Page<CardResponse> getCardsByEmail(String email, Pageable pageable) {
-        User user = getUserByEmail(email);
+    public Page<CardResponse> findCardsByEmail(String email, Pageable pageable) {
+        User user = userService.findByEmail(email);
 
         Page<Card> cards = cardRepository.findByUser(user, pageable);
 
         return cards.map(this::response);
     }
 
-    public CardResponse getCardByIdAndEmail(String email, Long cardId) {
-        User user = getUserByEmail(email);
-
-        Card card = getCardById(cardId);
+    public CardResponse findCardByEmailAndId(String email, Long cardId) {
+        User user = userService.findByEmail(email);
+        Card card = findCardById(cardId);
 
         if (!card.getUser().equals(user)) {
-            throw new OperationException("Вы не являетесь владельцем этой карты.");
+            throw new CardOperationException("Вы не являетесь владельцем этой карты.");
         }
 
         return new CardResponse(
@@ -64,12 +64,12 @@ public class CardService {
         );
     }
 
-    public BigDecimal getCardBalance(String email, Long cardId) {
-        return getCardByIdAndEmail(email, cardId).balance();
+    public BigDecimal findCardBalance(String email, Long cardId) {
+        return findCardByEmailAndId(email, cardId).balance();
     }
 
     public CardResponse createCard(CardCreateRequest cardCreateRequest) {
-        User user = getUserByEmail(cardCreateRequest.email());
+        User user = userService.findByEmail(cardCreateRequest.email());
 
         String cardNumber = NumberGenerator.generateNumber();
         String encryptNumber = encryptCard.encrypt(cardNumber);
@@ -96,10 +96,10 @@ public class CardService {
     }
 
     public void updateStatus(Long cardId, CardStatus newStatus) {
-        Card card = getCardById(cardId);
+        Card card = findCardById(cardId);
 
         if (card.getStatus() == CardStatus.EXPIRED && newStatus == CardStatus.ACTIVE) {
-            throw new OperationException("Невозможно активировать просроченную карту");
+            throw new CardOperationException("Невозможно активировать просроченную карту");
         }
 
         card.setStatus(newStatus);
@@ -107,27 +107,27 @@ public class CardService {
     }
 
     public void deleteCard(Long cardId) {
-        Card card = getCardById(cardId);
+        Card card = findCardById(cardId);
 
         cardRepository.delete(card);
     }
 
     @Transactional
     public void transferMoney(String email, CardTransferRequest cardTransferRequest) {
-        User user = getUserByEmail(email);
-        Card fromCard = getCardById(cardTransferRequest.fromCardId());
-        Card toCard = getCardById(cardTransferRequest.toCardId());
+        User user = userService.findByEmail(email);
+        Card fromCard = findCardById(cardTransferRequest.fromCardId());
+        Card toCard = findCardById(cardTransferRequest.toCardId());
 
         if (!fromCard.getUser().equals(user) || !toCard.getUser().equals(user)) {
-            throw new OperationException("Перевод возможен только между вашими картами");
+            throw new CardOperationException("Перевод возможен только между вашими картами");
         }
 
         if (fromCard.getStatus() != CardStatus.ACTIVE || toCard.getStatus() != CardStatus.ACTIVE) {
-            throw new OperationException("Перевод возможен только между активными картами");
+            throw new CardOperationException("Перевод возможен только между активными картами");
         }
 
         if (fromCard.getBalance().compareTo(cardTransferRequest.amount()) < 0) {
-            throw new OperationException("Недостаточно средств");
+            throw new CardOperationException("Недостаточно средств");
         }
 
         fromCard.setBalance(fromCard.getBalance().subtract(cardTransferRequest.amount()));
@@ -163,16 +163,9 @@ public class CardService {
         return "**** **** **** " + number.substring(number.length() - 4);
     }
 
-    private Card getCardById(Long cardId) {
+    private Card findCardById(Long cardId) {
         return cardRepository
                 .findById(cardId)
                 .orElseThrow(() -> new NotFoundException("Карта не найдена. ID: " + cardId));
     }
-
-    private User getUserByEmail(String email) {
-        return userRepository
-                .findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден. Email: " + email));
-    }
-
 }

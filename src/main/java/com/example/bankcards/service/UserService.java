@@ -6,7 +6,7 @@ import com.example.bankcards.dto.request.user.UserUpdateRequest;
 import com.example.bankcards.dto.response.user.UserResponse;
 import com.example.bankcards.entity.user.User;
 import com.example.bankcards.exception.NotFoundException;
-import com.example.bankcards.exception.OperationException;
+import com.example.bankcards.exception.UserOperationException;
 import com.example.bankcards.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,9 +29,8 @@ public class UserService {
     }
 
     public UserResponse findById(Long id) {
-        User user = userRepository.
-                findById(id).
-                orElseThrow(() -> new NotFoundException("Пользователь не найден. Id: " + id));
+        User user = findUserById(id);
+
         return response(user);
     }
 
@@ -43,7 +42,7 @@ public class UserService {
 
     public UserResponse createUser(UserCreateRequest userCreateRequest) {
         if (userRepository.existsByEmail(userCreateRequest.email())) {
-            throw new OperationException("Пользователь с email " + userCreateRequest.email() + " уже существует");
+            throw new UserOperationException("Пользователь с email " + userCreateRequest.email() + " уже существует");
         }
 
         User user = User.builder()
@@ -85,9 +84,7 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
-        User user = userRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден. Id: " + id));
+        User user = findUserById(id);
 
         userRepository.delete(user);
     }
@@ -100,5 +97,11 @@ public class UserService {
                 user.getEmail(),
                 user.getRole()
         );
+    }
+
+    private User findUserById(Long id) {
+        return userRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден. Id: " + id));
     }
 }

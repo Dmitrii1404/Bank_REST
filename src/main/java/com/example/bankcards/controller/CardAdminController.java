@@ -25,13 +25,13 @@ public class CardAdminController {
 
     @GetMapping()
     public ResponseEntity<Page<CardResponse>> getAllCards(Pageable pageable) {
-        Page<CardResponse> page = cardService.getAllCards(pageable);
+        Page<CardResponse> page = cardService.findAllCards(pageable);
         return ResponseEntity.ok(page);
     }
 
     @GetMapping("/request_block")
     public ResponseEntity<Page<BlockResponse>> getAllRequestBlocks(Pageable pageable) {
-        Page<BlockResponse> page = requestBlockService.getAll(pageable);
+        Page<BlockResponse> page = requestBlockService.findAll(pageable);
         return ResponseEntity.ok(page);
     }
 

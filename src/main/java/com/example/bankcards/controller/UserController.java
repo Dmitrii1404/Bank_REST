@@ -44,6 +44,6 @@ public class UserController {
             @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(requestBlockService.getRequestByUserId(userDetailsCustom.getUser().getId(), pageable));
+        return ResponseEntity.ok(requestBlockService.findRequestByUserId(userDetailsCustom.getUser().getId(), pageable));
     }
 }

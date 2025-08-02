@@ -31,7 +31,7 @@ public class CardUserController {
             @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(cardService.getCardsByEmail(userDetailsCustom.getUsername(), pageable));
+        return ResponseEntity.ok(cardService.findCardsByEmail(userDetailsCustom.getUsername(), pageable));
     }
 
     @GetMapping("/{id}")
@@ -39,7 +39,7 @@ public class CardUserController {
             @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(cardService.getCardByIdAndEmail(userDetailsCustom.getUsername(), id));
+        return ResponseEntity.ok(cardService.findCardByEmailAndId(userDetailsCustom.getUsername(), id));
     }
 
     @GetMapping("/{id}/balance")
@@ -47,7 +47,7 @@ public class CardUserController {
             @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
             @PathVariable Long id
     )  {
-        return ResponseEntity.ok(cardService.getCardBalance(userDetailsCustom.getUsername(), id));
+        return ResponseEntity.ok(cardService.findCardBalance(userDetailsCustom.getUsername(), id));
     }
 
     @PostMapping("/{id}/block-request")

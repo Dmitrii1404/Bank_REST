@@ -7,8 +7,9 @@ import com.example.bankcards.entity.card.CardStatus;
 import com.example.bankcards.entity.request.RequestBlock;
 import com.example.bankcards.entity.request.RequestStatus;
 import com.example.bankcards.entity.user.User;
+import com.example.bankcards.exception.CardOperationException;
 import com.example.bankcards.exception.NotFoundException;
-import com.example.bankcards.exception.OperationException;
+import com.example.bankcards.exception.UserOperationException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.RequestBlockRepository;
 import com.example.bankcards.repository.UserRepository;
@@ -26,13 +27,13 @@ public class RequestBlockService {
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
 
-    public Page<BlockResponse> getAll(Pageable pageable) {
+    public Page<BlockResponse> findAll(Pageable pageable) {
         Page<RequestBlock> requestBlocks = requestBlockRepository.findAll(pageable);
 
         return requestBlocks.map(this::response);
     }
 
-    public Page<BlockResponse> getRequestByUserId(Long id, Pageable pageable) {
+    public Page<BlockResponse> findRequestByUserId(Long id, Pageable pageable) {
         User user = userRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден. Id: " + id));
@@ -46,18 +47,18 @@ public class RequestBlockService {
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new NotFoundException("Карта не найдена. Id: " + cardId));
 
         if (!card.getUser().getId().equals(userId)) {
-            throw new OperationException("Карта вам не принадлежит");
+            throw new CardOperationException("Карта вам не принадлежит");
         }
 
         if (card.getStatus() == CardStatus.BLOCKED) {
-            throw new OperationException("Карта была заблокирована ранее");
+            throw new CardOperationException("Карта была заблокирована ранее");
         }
 
         User user = card.getUser();
         boolean exists = requestBlockRepository.existsByUserAndCard(user, card);
 
         if (exists) {
-            throw new OperationException("Запрос на блокировку выбранной карты уже существует");
+            throw new CardOperationException("Запрос на блокировку выбранной карты уже существует");
         }
 
         RequestBlock requestBlock = new RequestBlock();
