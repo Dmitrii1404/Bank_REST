@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping("api/v1/user/cards")
+@RequestMapping("api/v1/cards")
 @AllArgsConstructor
 @PreAuthorize("hasRole('USER')")
-public class CardController {
+public class CardUserController {
 
     private final CardService cardService;
     private final RequestBlockService requestBlockService;

@@ -41,7 +41,7 @@ public class CardAdminController {
         return ResponseEntity.ok(cardService.createCard(cardCreateRequest));
     }
 
-    @PostMapping("/{id}/complete_request")
+    @PostMapping("/complete_request/{id}")
     public ResponseEntity<Void> completeRequestBlock(
             @PathVariable Long id) {
         requestBlockService.completeRequestBlock(id);
