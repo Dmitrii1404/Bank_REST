@@ -7,6 +7,7 @@ import com.example.bankcards.dto.response.card.CardResponse;
 import com.example.bankcards.entity.card.CardStatus;
 import com.example.bankcards.service.CardService;
 import com.example.bankcards.service.RequestBlockService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +38,7 @@ public class CardAdminController {
 
     @PostMapping
     public ResponseEntity<CardResponse> createCard(
-            @RequestBody CardCreateRequest cardCreateRequest) {
+            @Valid @RequestBody CardCreateRequest cardCreateRequest) {
         return ResponseEntity.ok(cardService.createCard(cardCreateRequest));
     }
 
@@ -51,7 +52,7 @@ public class CardAdminController {
     @PutMapping("status/{id}")
     public ResponseEntity<Void> updateStatus(
             @PathVariable Long id,
-            @RequestBody CardStatus cardStatus
+            @Valid @RequestBody CardStatus cardStatus
     ) {
         cardService.updateStatus(id, cardStatus);
         return ResponseEntity.ok().build();

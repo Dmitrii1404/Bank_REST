@@ -7,6 +7,7 @@ import com.example.bankcards.dto.response.card.CardResponse;
 import com.example.bankcards.security.UserDetailsCustom;
 import com.example.bankcards.service.CardService;
 import com.example.bankcards.service.RequestBlockService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -61,7 +62,7 @@ public class CardUserController {
     @PostMapping("/transfer")
     public ResponseEntity<Void> transfer(
             @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
-            @RequestBody CardTransferRequest request
+            @Valid @RequestBody CardTransferRequest request
     ) {
         cardService.transferMoney(userDetailsCustom.getUsername(), request);
         return ResponseEntity.ok().build();

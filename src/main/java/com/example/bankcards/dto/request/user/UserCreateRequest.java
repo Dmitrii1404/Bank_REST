@@ -9,11 +9,11 @@ public record UserCreateRequest(
         @NotBlank(message = "Имя не может быть пустым")
         String firstName,
 
-        @NotBlank(message = "Фамилия не может быть пустым")
+        @NotBlank(message = "Фамилия не может быть пустой")
         String secondName,
 
         @NotBlank(message = "Email не может быть пустым")
-        @Email(message = "Неверный формат Email")
+        @Email(message = "Неверный формат Email. Ожидается example@gmail.com")
         String email,
 
         @NotBlank(message = "Пароль не может быть пустым")

@@ -8,6 +8,7 @@ import com.example.bankcards.entity.user.User;
 import com.example.bankcards.security.UserDetailsCustom;
 import com.example.bankcards.service.RequestBlockService;
 import com.example.bankcards.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +29,7 @@ public class UserController {
     @PutMapping("/update_password")
     public ResponseEntity<Void> updatePassword(
             @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
-            @RequestBody UserUpdatePassword newPassword
+            @Valid @RequestBody UserUpdatePassword newPassword
     ) {
         UserUpdateRequest userUpdateRequest = UserUpdateRequest.withPassword(newPassword.newPassword());
         User user = userDetailsCustom.getUser();

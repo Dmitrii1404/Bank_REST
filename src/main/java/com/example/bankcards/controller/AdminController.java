@@ -4,6 +4,7 @@ package com.example.bankcards.controller;
 import com.example.bankcards.dto.request.user.UserUpdateRequest;
 import com.example.bankcards.dto.response.user.UserResponse;
 import com.example.bankcards.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,7 +33,7 @@ public class AdminController {
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
-            @RequestBody UserUpdateRequest userUpdateRequest) {
+            @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
         return ResponseEntity.ok(userService.updateUser(id, userUpdateRequest));
     }
 
