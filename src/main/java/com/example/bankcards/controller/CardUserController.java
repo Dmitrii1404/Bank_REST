@@ -4,7 +4,6 @@ package com.example.bankcards.controller;
 import com.example.bankcards.dto.request.card.CardTransferRequest;
 import com.example.bankcards.dto.response.block.BlockResponse;
 import com.example.bankcards.dto.response.card.CardResponse;
-import com.example.bankcards.security.UserDetailsCustom;
 import com.example.bankcards.service.CardService;
 import com.example.bankcards.service.RequestBlockService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -45,10 +45,10 @@ public class CardUserController {
             ))
     @GetMapping
     public ResponseEntity<Page<CardResponse>> getCards(
-            @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
+            @AuthenticationPrincipal UserDetails userDetails,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(cardService.findCardsByEmail(userDetailsCustom.getUser(), pageable));
+        return ResponseEntity.ok(cardService.findCardsByEmail(userDetails.getUsername(), pageable));
     }
 
     @Operation(
@@ -75,10 +75,10 @@ public class CardUserController {
             ))
     @GetMapping("/{id}")
     public ResponseEntity<CardResponse> getCardById(
-            @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(cardService.findCardByUserAndId(userDetailsCustom.getUser(), id));
+        return ResponseEntity.ok(cardService.findCardByEmailAndId(userDetails.getUsername(), id));
     }
 
     @Operation(
@@ -105,10 +105,10 @@ public class CardUserController {
             ))
     @GetMapping("/{id}/balance")
     public ResponseEntity<BigDecimal> getCardBalance(
-            @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id
     )  {
-        return ResponseEntity.ok(cardService.findCardBalance(userDetailsCustom.getUser(), id));
+        return ResponseEntity.ok(cardService.findCardBalance(userDetails.getUsername(), id));
     }
 
     @Operation(
@@ -129,11 +129,11 @@ public class CardUserController {
             ))
     @GetMapping("/request_block")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<BlockResponse>> requestBlock(
-            @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
+    public ResponseEntity<Page<BlockResponse>> getRequestBlock(
+            @AuthenticationPrincipal UserDetails userDetails,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(requestBlockService.findRequestByUserId(userDetailsCustom.getUser().getId(), pageable));
+        return ResponseEntity.ok(requestBlockService.findRequestByEmail(userDetails.getUsername(), pageable));
     }
 
     @Operation(
@@ -158,12 +158,12 @@ public class CardUserController {
                     mediaType = "application/json",
                     schema = @Schema(type = "string")
             ))
-    @PostMapping("/{id}/block-request")
-    public ResponseEntity<BlockResponse> requestBlock(
-            @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
+    @PostMapping("/{id}/request_block")
+    public ResponseEntity<BlockResponse> createRequestBlock(
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(requestBlockService.createRequestBlock(userDetailsCustom.getUser().getId(), id));
+        return ResponseEntity.ok(requestBlockService.createRequestBlock(userDetails.getUsername(), id));
     }
 
     @Operation(
@@ -186,10 +186,10 @@ public class CardUserController {
             ))
     @PostMapping("/transfer")
     public ResponseEntity<Void> transfer(
-            @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody CardTransferRequest request
     ) {
-        cardService.transferMoney(userDetailsCustom.getUser(), request);
+        cardService.transferMoney(userDetails.getUsername(), request);
         return ResponseEntity.ok().build();
     }
 }

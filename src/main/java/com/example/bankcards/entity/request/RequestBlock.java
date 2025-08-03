@@ -4,10 +4,7 @@ package com.example.bankcards.entity.request;
 import com.example.bankcards.entity.card.Card;
 import com.example.bankcards.entity.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "request_block")
 public class RequestBlock {
 

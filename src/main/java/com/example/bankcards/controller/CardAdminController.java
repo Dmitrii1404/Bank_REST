@@ -31,7 +31,7 @@ public class CardAdminController {
     private final RequestBlockService requestBlockService;
 
     @Operation(
-            summary = "Получение всех карт",
+            summary = "Все карты",
             description = "Возвращает карты всех пользователей"
     )
     @ApiResponse(responseCode = "200",
@@ -47,7 +47,7 @@ public class CardAdminController {
     }
 
     @Operation(
-            summary = "Всех запросов на блокировку карт",
+            summary = "Все запросы на блокировку",
             description = "Возвращает все запросы на блокировку карт"
     )
     @ApiResponse(responseCode = "200",

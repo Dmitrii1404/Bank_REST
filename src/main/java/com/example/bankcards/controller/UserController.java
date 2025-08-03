@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -40,13 +41,11 @@ public class UserController {
             ))
     @PutMapping("/update_password")
     public ResponseEntity<Void> updatePassword(
-            @AuthenticationPrincipal UserDetailsCustom userDetailsCustom,
-            @Valid @RequestBody UserUpdatePassword newPassword
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody UserUpdatePassword userUpdatePassword
     ) {
-        UserUpdateRequest userUpdateRequest = UserUpdateRequest.withPassword(newPassword.newPassword());
-        User user = userDetailsCustom.getUser();
 
-        userService.updateUser(user.getId(), userUpdateRequest);
+        userService.updatePassword(userDetails.getUsername(), userUpdatePassword);
 
         return ResponseEntity.ok().build();
     }

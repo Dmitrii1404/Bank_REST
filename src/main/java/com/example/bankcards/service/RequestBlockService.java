@@ -33,20 +33,23 @@ public class RequestBlockService {
         return requestBlocks.map(this::response);
     }
 
-    public Page<BlockResponse> findRequestByUserId(Long id, Pageable pageable) {
+    public Page<BlockResponse> findRequestByEmail(String email, Pageable pageable) {
         User user = userRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден. Id: " + id));
+                .findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден. Email: " + email));
 
         Page<RequestBlock> requestBlocks = requestBlockRepository.findByUser(user, pageable);
 
         return requestBlocks.map(this::response);
     }
 
-    public BlockResponse createRequestBlock(Long userId, Long cardId) {
+    public BlockResponse createRequestBlock(String email, Long cardId) {
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден. Email: " + email));
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new NotFoundException("Карта не найдена. Id: " + cardId));
 
-        if (!card.getUser().getId().equals(userId)) {
+        if (!card.getUser().getId().equals(user.getId())) {
             throw new CardOperationException("Карта вам не принадлежит");
         }
 
@@ -54,8 +57,8 @@ public class RequestBlockService {
             throw new CardOperationException("Карта была заблокирована ранее");
         }
 
-        User user = card.getUser();
-        boolean exists = requestBlockRepository.existsByUserAndCard(user, card);
+        User userCard = card.getUser();
+        boolean exists = requestBlockRepository.existsByUserAndCard(userCard, card);
 
         if (exists) {
             throw new CardOperationException("Запрос на блокировку выбранной карты уже существует");

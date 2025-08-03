@@ -2,6 +2,7 @@ package com.example.bankcards.service;
 
 
 import com.example.bankcards.dto.request.user.UserCreateRequest;
+import com.example.bankcards.dto.request.user.UserUpdatePassword;
 import com.example.bankcards.dto.request.user.UserUpdateRequest;
 import com.example.bankcards.dto.response.user.UserResponse;
 import com.example.bankcards.entity.user.User;
@@ -79,6 +80,13 @@ public class UserService {
         userRepository.save(user);
 
         return response(user);
+    }
+
+    public void updatePassword(String email, UserUpdatePassword userUpdatePassword) {
+        User user = findByEmail(email);
+
+        user.setPassword(passwordEncoder.encode(userUpdatePassword.newPassword()));
+        userRepository.save(user);
     }
 
     public void deleteUser(Long id) {

@@ -37,13 +37,15 @@ public class CardService {
         return cards.map(this::response);
     }
 
-    public Page<CardResponse> findCardsByEmail(User user, Pageable pageable) {
+    public Page<CardResponse> findCardsByEmail(String email, Pageable pageable) {
+        User user = userService.findByEmail(email);
         Page<Card> cards = cardRepository.findByUser(user, pageable);
 
         return cards.map(this::response);
     }
 
-    public CardResponse findCardByUserAndId(User user, Long cardId) {
+    public CardResponse findCardByEmailAndId(String email, Long cardId) {
+        User user = userService.findByEmail(email);
         Card card = findCardById(cardId);
 
         if (!card.getUser().equals(user)) {
@@ -61,8 +63,8 @@ public class CardService {
         );
     }
 
-    public BigDecimal findCardBalance(User user, Long cardId) {
-        return findCardByUserAndId(user, cardId).balance();
+    public BigDecimal findCardBalance(String email, Long cardId) {
+        return findCardByEmailAndId(email, cardId).balance();
     }
 
     public CardResponse createCard(CardCreateRequest cardCreateRequest) {
@@ -110,7 +112,8 @@ public class CardService {
     }
 
     @Transactional
-    public void transferMoney(User user, CardTransferRequest cardTransferRequest) {
+    public void transferMoney(String email, CardTransferRequest cardTransferRequest) {
+        User user = userService.findByEmail(email);
         Card fromCard = findCardById(cardTransferRequest.fromCardId());
         Card toCard = findCardById(cardTransferRequest.toCardId());
 
