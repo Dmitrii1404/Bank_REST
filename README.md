@@ -43,7 +43,7 @@
    После того как контейнеры будут запущены, приложение будет доступно по адресу:
 
     - **Основной интерфейс:** [http://localhost:8000](http://localhost:8000)
-    - **Документация API:** [http://localhost:8000/docs](http://localhost:8000/swagger-ui.html)
+    - **Документация API:** [http://localhost:8000/swagger-ui.html](http://localhost:8000/swagger-ui.html)
 
 
 <h2> Структура проекта </h2>
