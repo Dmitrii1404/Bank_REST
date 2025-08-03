@@ -3,13 +3,15 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/bankcards_db
-    username: postgres
-    password: Dima_2145
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
   liquibase:
     enabled: true
     change-log: classpath:db/migration/changelog/db.changelog-master.yaml
+
   jpa:
     hibernate:
       ddl-auto: validate
