@@ -55,7 +55,7 @@
     |   ├── java/
     |   |   ├── controller                  # REST-контроллеры для управления пользователями, картами и переводами
     |   |   ├── dto                         # Классы передачи данных между слоями приложения
-    |   |   ├── entity                      # JPA-сущности: Card, User, Role
+    |   |   ├── entity                      # JPA-сущности: Card, User, RequestBlock
     |   |   ├── exception                   # Глобальный обработчик ошибок и пользовательские исключения
     |   |   ├── repository                  # Интерфейсы Spring Data JPA для доступа к базе данных.
     |   |   ├── security                    # Конфигурации и компоненты безопасности: JWT, фильтры, UserDetailsService
@@ -68,7 +68,7 @@
     ├── test/
     |   ├── controller                      # Unit тесты для REST API с использованием MockMvc
     |   └── service                         # Юнит-тесты бизнес-логики с использованием моков
-    pom.mxl                                 # файл для управления зависимостями проекта
+    pom.xml                                 # файл для управления зависимостями проекта
 ```
   
 
@@ -151,5 +151,5 @@
 
 <h2>Технологии</h2>
   <p>
-    Java 21, Spring Boot, Spring Security, Spring Data JPA, PostgreSQL, Liquibase, Docker, JWT, Swagger (OpenAPI)
+    Java 21, Spring Boot, Spring Security, Spring Data JPA, PostgreSQL, Liquibase, Docker, JWT, Swagger (OpenAPI), Lombok, Maven
   </p>
