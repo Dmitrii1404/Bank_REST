@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,23 +25,27 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional(readOnly = true)
     public Page<UserResponse> findAll(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
         return users.map(this::response);
     }
 
+    @Transactional(readOnly = true)
     public UserResponse findById(Long id) {
         User user = findUserById(id);
 
         return response(user);
     }
 
+    @Transactional(readOnly = true)
     public User findByEmail(String email) {
         return userRepository.
                 findByEmail(email).
                 orElseThrow(() -> new NotFoundException("Пользователь не найден. Email: " + email));
     }
 
+    @Transactional
     public UserResponse createUser(UserCreateRequest userCreateRequest) {
         if (userRepository.existsByEmail(userCreateRequest.email())) {
             throw new UserOperationException("Пользователь с email " + userCreateRequest.email() + " уже существует");
@@ -59,8 +64,7 @@ public class UserService {
         return response(user);
     }
 
-
-
+    @Transactional
     public UserResponse updateUser(Long id, UserUpdateRequest userUpdateRequest) {
         User user = findUserById(id);
 
@@ -82,6 +86,7 @@ public class UserService {
         return response(user);
     }
 
+    @Transactional
     public void updatePassword(String email, UserUpdatePassword userUpdatePassword) {
         User user = findByEmail(email);
 
@@ -89,6 +94,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void deleteUser(Long id) {
         User user = findUserById(id);
 

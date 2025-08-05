@@ -9,9 +9,7 @@ import com.example.bankcards.entity.card.CardStatus;
 import com.example.bankcards.entity.user.User;
 import com.example.bankcards.exception.CardOperationException;
 import com.example.bankcards.exception.NotFoundException;
-import com.example.bankcards.exception.UserOperationException;
 import com.example.bankcards.repository.CardRepository;
-import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.util.EncryptCard;
 import com.example.bankcards.util.NumberGenerator;
 import lombok.AllArgsConstructor;
@@ -31,12 +29,14 @@ public class CardService {
     private final UserService userService;
     private final EncryptCard encryptCard;
 
+    @Transactional(readOnly = true)
     public Page<CardResponse> findAllCards(Pageable pageable) {
         Page<Card> cards = cardRepository.findAll(pageable);
 
         return cards.map(this::response);
     }
 
+    @Transactional(readOnly = true)
     public Page<CardResponse> findCardsByEmail(String email, Pageable pageable) {
         User user = userService.findByEmail(email);
         Page<Card> cards = cardRepository.findByUser(user, pageable);
@@ -44,6 +44,7 @@ public class CardService {
         return cards.map(this::response);
     }
 
+    @Transactional(readOnly = true)
     public CardResponse findCardByEmailAndId(String email, Long cardId) {
         User user = userService.findByEmail(email);
         Card card = findCardById(cardId);
@@ -63,10 +64,12 @@ public class CardService {
         );
     }
 
+    @Transactional(readOnly = true)
     public BigDecimal findCardBalance(String email, Long cardId) {
         return findCardByEmailAndId(email, cardId).balance();
     }
 
+    @Transactional
     public CardResponse createCard(CardCreateRequest cardCreateRequest) {
         User user = userService.findByEmail(cardCreateRequest.email());
 
@@ -94,6 +97,7 @@ public class CardService {
         );
     }
 
+    @Transactional
     public void updateStatus(Long cardId, CardStatus newStatus) {
         Card card = findCardById(cardId);
 
@@ -105,6 +109,7 @@ public class CardService {
         cardRepository.save(card);
     }
 
+    @Transactional
     public void deleteCard(Long cardId) {
         Card card = findCardById(cardId);
 
@@ -117,8 +122,16 @@ public class CardService {
         Card fromCard = findCardById(cardTransferRequest.fromCardId());
         Card toCard = findCardById(cardTransferRequest.toCardId());
 
+        if (cardTransferRequest.amount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new CardOperationException("Сумма должна быть положительной");
+        }
+
         if (!fromCard.getUser().equals(user) || !toCard.getUser().equals(user)) {
             throw new CardOperationException("Перевод возможен только между вашими картами");
+        }
+
+        if (cardTransferRequest.fromCardId().equals(cardTransferRequest.toCardId())) {
+            throw new CardOperationException("Нельзя переводить на ту же карту");
         }
 
         if (fromCard.getStatus() != CardStatus.ACTIVE || toCard.getStatus() != CardStatus.ACTIVE) {

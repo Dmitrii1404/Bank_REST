@@ -25,28 +25,27 @@ public class RequestBlockService {
 
     private final RequestBlockRepository requestBlockRepository;
     private final CardRepository cardRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
+    @Transactional(readOnly = true)
     public Page<BlockResponse> findAll(Pageable pageable) {
         Page<RequestBlock> requestBlocks = requestBlockRepository.findAll(pageable);
 
         return requestBlocks.map(this::response);
     }
 
+    @Transactional(readOnly = true)
     public Page<BlockResponse> findRequestByEmail(String email, Pageable pageable) {
-        User user = userRepository
-                .findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден. Email: " + email));
+        User user = userService.findByEmail(email);
 
         Page<RequestBlock> requestBlocks = requestBlockRepository.findByUser(user, pageable);
 
         return requestBlocks.map(this::response);
     }
 
+    @Transactional
     public BlockResponse createRequestBlock(String email, Long cardId) {
-        User user = userRepository
-                .findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден. Email: " + email));
+        User user = userService.findByEmail(email);
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new NotFoundException("Карта не найдена. Id: " + cardId));
 
         if (!card.getUser().getId().equals(user.getId())) {
